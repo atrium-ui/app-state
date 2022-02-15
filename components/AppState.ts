@@ -1,41 +1,34 @@
-import { html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import State from '../app/State';
+import StateElement from '../types/StateElement';
+
 
 // This is a adapter element, that connects scoped dom elements
 // to the internal application states using DOM events.
-
-interface StateElement extends HTMLElement {
-  value: any
-}
 
 @customElement('app-state')
 export default class AppState extends LitElement {
 
   // Event root scope
-  get stateType() {
-    return this.getAttribute('type') || 'global';
-  }
+  @property({ type: String })
+  type: string = 'global';
 
   // state key comes from the target element attributes
   //  or this app states attributes as fallback
-  get stateKey() {
-    return this.getAttribute('key');
-  }
+  @property({ type: String })
+  scope?: string;
 
-  handler = ((e: CustomEvent) => {
-    this.handleEvent(e);
-  }) as EventListener;
 
   constructor() {
     super();
 
     // set value (property) of every element with state key attribute
-    State.onState(this.stateType, (data) => {
+    State.onState(this.type, (data) => {
       // on external state updates
-      //  set "value" attribute of children with a "state-key" attribute
+      //  set "value" attribute of children with a "state-scope" attribute
       for(let key in data) {
-        const eles = this.querySelectorAll(`[state-key="${key}"]`) as NodeListOf<StateElement>;
+        const eles = this.querySelectorAll(`[state-scope="${key}"]`) as NodeListOf<StateElement>;
         for(let ele of eles) {
           ele.value = data[key];
         }
@@ -45,43 +38,44 @@ export default class AppState extends LitElement {
 
   connectedCallback(): void {
     // handle any change event
-    this.addEventListener('change', this.handler);
-
+    this.addEventListener('change', this.handleEvent as EventListener);
     // handle any input event
-    this.addEventListener('input', this.handler);
+    this.addEventListener('input', this.handleEvent as EventListener);
   }
 
   disconnectedCallback(): void {
-    this.removeEventListener('change', this.handler);
-    this.removeEventListener('input', this.handler);
+    this.removeEventListener('change', this.handleEvent as EventListener);
+    this.removeEventListener('input', this.handleEvent as EventListener);
   }
 
   // Handle input events from elements
-  //  Uses "state-key" and "state-name" of target element.
-  //  As fallback use the "state-key" attribute from this app-state element.
+  //  Uses "state-scope" and "state-name" of target element.
+  //  As fallback use the "state-scope" attribute from this app-state element.
   handleEvent(e: CustomEvent) {
     const target = e.target as HTMLInputElement;
-    const key = target.getAttribute('state-key') || this.stateKey;
-    const name = target.getAttribute('state-name');
-    const stateValue = e.detail?.value != null ? e.detail?.value : target.value;
 
-    if (name != null && key != null) {
+    if(target.hasAttribute('state-scope')) {
+      const scope: string = target.getAttribute('state-scope') || this.scope;
+      const stateValue = e.detail?.value != null ? e.detail?.value : target.value;
 
-      // set the value of a named state inside a scope
-      const state = State.getState(this.stateType)[key];
-      state[name] = stateValue;
-      State.setState(this.stateType, {
-        [key]: state,
-      });
-      e.cancelBubble = true;
+      if(target.hasAttribute('state-key')) {
+        const key: string = target.getAttribute('state-key');
+      
+        // set the value of a named state inside a scope
+        const state = State.getState(this.type)[key];
+        state[key] = stateValue;
+        State.setState(this.type, {
+          [scope]: state,
+        });
+        e.cancelBubble = true;
+      } else {
 
-    } else if (key != null) {
-
-      // set root state value of a scope
-      State.setState(this.stateType, {
-        [key]: stateValue,
-      });
-      e.cancelBubble = true;
+        // set root state value of a scope
+        State.setState(this.type, {
+          [scope]: stateValue,
+        });
+        e.cancelBubble = true;
+      }
     }
   }
 

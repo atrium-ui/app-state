@@ -1,56 +1,79 @@
 import DefaultState from './DefaultState';
 
-type StateObject = {
-  [key: string]: any
-}
 
-// NEXT: replace JSON with "deepcopy" at some point
+/**
+ * Stores the application state
+ */
 let state: StateObject = JSON.parse(JSON.stringify(DefaultState));
+
 
 export default class State {
 
-  // update state key in scope
-  static setState(stateId: string, newState: any) {
+  /**
+   * This getter returns the current global state
+   *
+   * @return {StateObject} State Object
+   */
+  static get currentState(): StateObject {
+    return state;
+  }
+
+  /**
+   * Updates state in scope
+   *
+   * @param {string} scope - State scope
+   * @param {object} data - State data
+   */
+  static setState(scope: string, newState: any) {
     // deep copy new state and save to global state
-    state[stateId] = Object.assign(state[stateId] || {}, JSON.parse(JSON.stringify(newState)));
+    // NEXT: replace JSON with "deepcopy" at some point
+    state[scope] = Object.assign(state[scope] || {}, JSON.parse(JSON.stringify(newState)));
 
-    this.emitChange(stateId);
+    this.emitChange(scope);
   }
 
-  // delete state key in scope
-  static deleteState(stateId: string, stateKey: string) {
-    delete state[stateId][stateKey];
-
-    this.emitChange(stateId);
+  /**
+   * delete state in scope
+   *
+   * @param {string} scope - State scope
+   */
+  static deleteState(scope: string, stateKey: string) {
+    delete state[scope][stateKey];
+    this.emitChange(scope);
   }
 
-  // send change to all listeners in scope
-  static emitChange(stateId: string) {
-    const ev = new Event('state:update:' + stateId);
+  /**
+   * send change to all listeners in scope
+   *
+   * @param {string} scope - State scope
+   */
+  static emitChange(scope: string) {
+    const ev = new Event('state:update:' + scope);
     window.dispatchEvent(ev);
     localStorage.setItem('app-state', JSON.stringify(state));
   }
 
-  // listen to state changes
-  static onState(stateId = 'global', callback: (s: StateObject) => void) {
-    window.addEventListener('state:update:' + stateId, () => {
-      callback(State.getState(stateId));
+  /**
+   * listen to state changes of scope
+   *
+   * @param {string} scope - State scope
+   * @param {function} callback - Callback function
+   */
+  static onState(scope = 'global', callback: (s: StateObject) => void) {
+    window.addEventListener('state:update:' + scope, () => {
+      callback(State.getState(scope));
     });
   }
 
-  // Get scoped state
+  /**
+   * get state of scope
+   *
+   * @param {string} scope - State scope
+   */
   static getState(scope = 'global') {
     return state[scope] || {};
   }
 
-  // Reset state to "DefaultState"
-  static reset() {
-    state = JSON.parse(JSON.stringify(DefaultState));
-    const ev = new Event('state:update');
-    window.dispatchEvent(ev);
-    localStorage.setItem('app-state', JSON.stringify(state));
-    console.log(state);
-  }
 }
 
 // Global State var for development
