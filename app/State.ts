@@ -1,5 +1,13 @@
 import DefaultState from './DefaultState';
 
+/**
+ * Application State
+ * @typedef {Object} StateObject
+ */
+type StateObject = {
+  [key: string]: any
+}
+
 
 /**
  * Stores the application state
@@ -28,7 +36,6 @@ export default class State {
     // deep copy new state and save to global state
     // NEXT: replace JSON with "deepcopy" at some point
     state[scope] = Object.assign(state[scope] || {}, JSON.parse(JSON.stringify(newState)));
-
     this.emitChange(scope);
   }
 
@@ -60,7 +67,7 @@ export default class State {
    * @param {function} callback - Callback function
    */
   static onState(scope = 'global', callback: (s: StateObject) => void) {
-    window.addEventListener('state:update:' + scope, () => {
+    window.addEventListener('state:update:' + scope, (e) => {
       callback(State.getState(scope));
     });
   }

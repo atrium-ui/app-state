@@ -11,7 +11,7 @@ Once the Event reaches the first app-state Element, it will cancel the bubbling 
 
   <h1>Test app-state</h1>
 
-  <app-state type="some_scope">
+  <app-state scope="some_scope">
     <input state-key="input_value"/>
   </app-state>
 
@@ -34,7 +34,7 @@ Additionally a ```key``` property can be defined by the target element OR the ap
 
 ```JSON
 {
-  [type]: {
+  [scope]: {
     [key]: <target-element "value">
   }
 }
