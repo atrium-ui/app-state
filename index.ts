@@ -1,4 +1,4 @@
-import "./components/AppState";
-import State from "./app/State";
+import './src/components/AppState';
+import State from "./src/State";
 
-export default State;
+export { State };

@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import State from '../app/State';
+import State from '../State';
 import StateElement from '../types/StateElement';
 
 
@@ -10,14 +10,20 @@ import StateElement from '../types/StateElement';
 @customElement('app-state')
 export default class AppState extends LitElement {
 
-  // state key comes from the target element attributes
-  //  or this app states attributes as fallback
+  /**
+   * state key comes from the target element attributes
+   *  or this app states attributes as fallback
+   */
   @property({ type: String })
   key?: string;
 
-  // Event root scope
+  /**
+   * Event root scope
+   */
   @property({ type: String, reflect: true })
   scope?: string;
+
+  _removeStateUpdateHandler?: () => void;
 
   connectedCallback(): void {
     // handle any change event
@@ -28,8 +34,9 @@ export default class AppState extends LitElement {
 
     // on external state updates
     //  set "value" attribute of children with a "state-scope" attribute
-    // TODO: remove listener on disconnect
-    State.onState(this.scope, (data) => {
+    // TODO: remove listener on disconnect    
+    this._removeStateUpdateHandler = State.onState(this.scope, (data) => {
+      
       for(let key in data) {
         const eles = this.querySelectorAll(`[state-key="${key}"]`) as NodeListOf<StateElement>;
 
@@ -43,11 +50,17 @@ export default class AppState extends LitElement {
   disconnectedCallback(): void {
     this.removeEventListener('change', this.handleEvent as EventListener);
     this.removeEventListener('input', this.handleEvent as EventListener);
+
+    if(this._removeStateUpdateHandler) {
+      this._removeStateUpdateHandler();
+    }
   }
 
-  // Handle input events from elements
-  //  Uses "state-scope" and "state-name" of target element.
-  //  As fallback use the "state-scope" attribute from this app-state element.
+  /**
+   * Handle input events from elements
+   *  Uses "state-key" and "state-id" of target element.
+   *  As fallback use the "state-key" attribute from this app-state element.
+   */
   handleEvent(e: CustomEvent) {
     const target = e.target as HTMLInputElement;
 

@@ -69,10 +69,18 @@ export default class State {
   /**
    * listen to state changes of scope
    */
-  public static onState(scope = 'global', callback: (s: StateObject) => void) {
-    window.addEventListener('state:update:' + scope, (e) => {
+  public static onState(scope = 'global', callback: (s: StateObject) => void): () => void {
+
+    const eventName = 'state:update:' + scope;
+    const handler = (e) => {
       callback(State.getState(scope));
-    });
+    };
+
+    window.addEventListener(eventName, handler);
+
+    return () => {
+      window.removeEventListener(eventName, handler);
+    };
   }
 
   /**

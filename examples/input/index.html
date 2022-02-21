@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>app-state | Input Example</title>
+
+  <link rel="stylesheet" href="../examples.css">
+
+  <script src="../../dist/app-state.min.js"></script>
+
+  <script>
+    customElements.define("text-display", class extends HTMLElement {
+      set value(val) {
+        console.log(val);
+        this.innerHTML = val;
+      }
+    })
+  </script>
+</head>
+
+<body>
+  <h1>App State Input Example</h1>
+
+  <div>
+    <app-state scope="text">
+      <text-display state-key="title"></text-display>
+    </app-state>
+  </div>
+</body>
+
+</html>
