@@ -167,8 +167,7 @@ export default class State {
    * compare two states
    */
   public static compareState(stateA: StateObject, stateB: StateObject): boolean {
-    const filter = (k, v) => v !== null;
-    return JSON.stringify(stateA, filter) == JSON.stringify(stateB, filter);
+    return JSON.stringify(stateA) == JSON.stringify(stateB);
   }
 
 }
