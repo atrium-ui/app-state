@@ -33,8 +33,7 @@ export default class AppState extends LitElement {
 
 
     // on external state updates
-    //  set "value" attribute of children with a "state-scope" attribute
-    // TODO: remove listener on disconnect    
+    //  set "value" attribute of children with a "state-key" attribute
     this._removeStateUpdateHandler = State.onState(this.scope, (data) => {
       
       for(let key in data) {
