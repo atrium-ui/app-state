@@ -51,6 +51,14 @@ export default class State {
   }
 
   /**
+   * delete scope in state
+   */
+  public static deleteScope(scope: string) {
+    delete state[scope];
+    this.emitChange(scope);
+  }
+
+  /**
    * get state of scope
    */
   public static getState(scope = 'global') {
