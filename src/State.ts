@@ -143,7 +143,7 @@ export default class State {
             const aValue = objectA[key];
             const bValue = objectB[key];
             if (aValue !== bValue) {
-              local[key] = bValue || "undefined";
+              local[key] = bValue != null ? bValue : null;
             }
           }
         } else {
