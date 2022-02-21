@@ -19,11 +19,6 @@ export default class AppState extends LitElement {
   @property({ type: String, reflect: true })
   scope?: string;
 
-
-  constructor() {
-    super();
-  }
-
   connectedCallback(): void {
     // handle any change event
     this.addEventListener('change', this.handleEvent as EventListener);

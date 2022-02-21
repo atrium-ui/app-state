@@ -1,5 +1,3 @@
-import DefaultState from './DefaultState';
-
 /**
  * Application State
  * @typedef {Object} StateObject
@@ -10,29 +8,34 @@ type StateObject = {
 
 
 /**
+ * Checks if arguemtn is a valid StateObject
+ */
+function isAnStateObject(something) {
+  return something != null &&
+        typeof something !== 'string' &&
+        !Number.isNaN(something) &&
+        Object.values(something).length > 0;
+}
+
+/**
  * Stores the application state
  */
-let state: StateObject = JSON.parse(JSON.stringify(DefaultState));
+let state: StateObject = {};
 
 
 export default class State {
 
   /**
    * This getter returns the current global state
-   *
-   * @return {StateObject} State Object
    */
-  static get currentState(): StateObject {
+  public static get currentState(): StateObject {
     return state;
   }
 
   /**
    * Updates state in scope
-   *
-   * @param {string} scope - State scope
-   * @param {object} data - State data
    */
-  static setState(scope: string, newState: any) {
+  public static setState(scope: string, newState: any) {
     // deep copy new state and save to global state
     // NEXT: replace JSON with "deepcopy" at some point
     state[scope] = Object.assign(state[scope] || {}, JSON.parse(JSON.stringify(newState)));
@@ -41,20 +44,23 @@ export default class State {
 
   /**
    * delete state in scope
-   *
-   * @param {string} scope - State scope
    */
-  static deleteState(scope: string, stateKey: string) {
+  public static deleteState(scope: string, stateKey: string) {
     delete state[scope][stateKey];
     this.emitChange(scope);
   }
 
   /**
-   * send change to all listeners in scope
-   *
-   * @param {string} scope - State scope
+   * get state of scope
    */
-  static emitChange(scope: string) {
+  public static getState(scope = 'global') {
+    return state[scope] || {};
+  }
+
+  /**
+   * send change to all listeners in scope
+   */
+  private static emitChange(scope: string) {
     const ev = new Event('state:update:' + scope);
     window.dispatchEvent(ev);
     localStorage.setItem('app-state', JSON.stringify(state));
@@ -62,23 +68,91 @@ export default class State {
 
   /**
    * listen to state changes of scope
-   *
-   * @param {string} scope - State scope
-   * @param {function} callback - Callback function
    */
-  static onState(scope = 'global', callback: (s: StateObject) => void) {
+  public static onState(scope = 'global', callback: (s: StateObject) => void) {
     window.addEventListener('state:update:' + scope, (e) => {
       callback(State.getState(scope));
     });
   }
 
   /**
-   * get state of scope
-   *
-   * @param {string} scope - State scope
+   * merge two state objects (A + B)
    */
-  static getState(scope = 'global') {
-    return state[scope] || {};
+  public static mergeState(stateA: StateObject, stateB: StateObject): StateObject {
+
+    const itterateKeys = (objectA: StateObject, objectB: StateObject) => {
+      const local = JSON.parse(JSON.stringify(objectA));
+
+      const allKeys = new Set([...Object.keys(objectA), ...Object.keys(objectB)]);
+
+      for (let key of allKeys) {
+        if (key in objectA && key in objectB) {
+          // exists, itterate through this object too, if it is an object
+          if (isAnStateObject(objectB[key])) {
+            local[key] = itterateKeys(objectA[key], objectB[key]);
+          } else {
+            local[key] = objectB[key];
+          }
+        } else {
+          const value = objectA[key] || objectB[key];
+          if (value != null) {
+            local[key] = JSON.parse(JSON.stringify(value));
+          }
+        }
+      }
+
+      return local;
+    }
+
+    return itterateKeys(stateA, stateB);
+  }
+
+  /**
+   * compare two states and return differneces from A to B (B - A)
+   */
+  public static subtractState(stateA: StateObject, stateB: StateObject): StateObject {
+    // TODO: Compare this method with comparing two serialized state strigns
+
+    const itterateKeys = (objectA: StateObject, objectB: StateObject): StateObject => {
+      const local = {};
+
+      const allKeys = new Set([...Object.keys(objectA), ...Object.keys(objectB)]);
+
+      for (let key of allKeys) {
+        if (key in objectA && key in objectB) {
+          // exists in both objects, itterate through this object too, if it is an object
+          if (isAnStateObject(objectB[key])) {
+            local[key] = itterateKeys(objectA[key], objectB[key]);
+          } else {
+            const aValue = objectA[key];
+            const bValue = objectB[key];
+            if (aValue !== bValue) {
+              local[key] = bValue || "undefined";
+            }
+          }
+        } else {
+          // exists in only one of them
+          const value = objectB[key];
+          if (value != null) {
+            local[key] = JSON.parse(JSON.stringify(value));
+          } else {
+            local[key] = null;
+          }
+        }
+      }
+
+      return local;
+    }
+
+    return itterateKeys(stateA, stateB);
+  }
+
+  /**
+   * compare two states
+   */
+  public static compareState(stateA: StateObject, stateB: StateObject): boolean {
+    const filter = (k, v) => v !== null;
+    return JSON.stringify(stateA, filter) == JSON.stringify(stateB, filter);
   }
 
 }
