@@ -79,9 +79,17 @@ export default class State {
    */
   public static onState(scope = 'global', callback: (s: StateObject) => void): () => void {
 
+    let lastState = {};
+
     const eventName = 'state:update:' + scope;
     const handler = (e) => {
-      callback(State.getState(scope));
+      const state = State.getState(scope);
+      const stateChanges = State.subtractState(lastState, state);
+      lastState = JSON.parse(JSON.stringify(state));
+      // Only serve changed state keys
+      if(Object.keys(stateChanges).length > 0) {
+        callback(stateChanges);
+      }
     };
 
     window.addEventListener(eventName, handler);
