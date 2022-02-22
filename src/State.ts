@@ -112,10 +112,12 @@ export default class State {
       for (let key of allKeys) {
         if (key in objectA && key in objectB) {
           // exists, itterate through this object too, if it is an object
-          if (isAnStateObject(objectB[key])) {
-            local[key] = itterateKeys(objectA[key], objectB[key]);
+          const bValue = objectB[key];
+
+          if (isAnStateObject(bValue)) {
+            local[key] = itterateKeys(objectA[key], bValue);
           } else {
-            local[key] = objectB[key];
+            local[key] = bValue;
           }
         } else {
           const value = objectA[key] || objectB[key];
@@ -145,12 +147,12 @@ export default class State {
       for (let key of allKeys) {
         if (key in objectA && key in objectB) {
           // exists in both objects, itterate through this object too, if it is an object
-          if (isAnStateObject(objectB[key])) {
-            local[key] = itterateKeys(objectA[key], objectB[key]);
+          const bValue = objectB[key];
+
+          if (isAnStateObject(bValue)) {
+            local[key] = itterateKeys(objectA[key], bValue);
           } else {
-            const aValue = objectA[key];
-            const bValue = objectB[key];
-            if (aValue !== bValue) {
+            if (objectA[key] !== bValue) {
               local[key] = bValue != null ? bValue : null;
             }
           }
