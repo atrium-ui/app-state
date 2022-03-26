@@ -1,15 +1,13 @@
-import { LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import State from '../State';
-import StateElement from '../types/StateElement';
-
+import { LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import State from "../State";
+import StateElement from "../types/StateElement";
 
 // This is a adapter element, that connects scoped dom elements
 // to the internal application states using DOM events.
 
-@customElement('app-state')
+@customElement("app-state")
 export default class AppState extends LitElement {
-
   /**
    * state key comes from the target element attributes
    *  or this app states attributes as fallback
@@ -27,19 +25,19 @@ export default class AppState extends LitElement {
 
   connectedCallback(): void {
     // handle any change event
-    this.addEventListener('change', this.handleEvent as EventListener);
+    this.addEventListener("change", this.handleEvent as EventListener);
     // handle any input event
-    this.addEventListener('input', this.handleEvent as EventListener);
-
+    this.addEventListener("input", this.handleEvent as EventListener);
 
     // on external state updates
     //  set "value" attribute of children with a "state-key" attribute
     this._removeStateUpdateHandler = State.onState(this.scope, (data) => {
-      
-      for(let key in data) {
-        const eles = this.querySelectorAll(`[state-key="${key}"]`) as NodeListOf<StateElement>;
+      for (const key in data) {
+        const eles = this.querySelectorAll(
+          `[state-key="${key}"]`
+        ) as NodeListOf<StateElement>;
 
-        for(let ele of eles) {
+        for (const ele of eles) {
           ele.value = data[key];
         }
       }
@@ -47,10 +45,10 @@ export default class AppState extends LitElement {
   }
 
   disconnectedCallback(): void {
-    this.removeEventListener('change', this.handleEvent as EventListener);
-    this.removeEventListener('input', this.handleEvent as EventListener);
+    this.removeEventListener("change", this.handleEvent as EventListener);
+    this.removeEventListener("input", this.handleEvent as EventListener);
 
-    if(this._removeStateUpdateHandler) {
+    if (this._removeStateUpdateHandler) {
       this._removeStateUpdateHandler();
     }
   }
@@ -63,16 +61,15 @@ export default class AppState extends LitElement {
   handleEvent(e: CustomEvent) {
     const target = e.target as HTMLInputElement;
 
-    if(!this.scope) return;
+    if (!this.scope) return;
 
-    if(target.hasAttribute('state-key')) {
-      // @ts-expect-error
-      const key: string = target.getAttribute('state-key') || this.key;
-      const stateValue = e.detail?.value != null ? e.detail?.value : target.value;
+    if (target.hasAttribute("state-key")) {
+      const key: string = target.getAttribute("state-key") || this.key;
+      const stateValue =
+        e.detail?.value != null ? e.detail?.value : target.value;
 
-      if(target.hasAttribute('state-id')) {
-        // @ts-expect-error
-        const id: string = target.getAttribute('state-id');
+      if (target.hasAttribute("state-id")) {
+        const id: string = target.getAttribute("state-id");
 
         // set the value of a named state inside a scope
         const state = State.getState(this.scope)[key];
@@ -82,7 +79,6 @@ export default class AppState extends LitElement {
         });
         e.cancelBubble = true;
       } else {
-
         // set root state value of a scope
         State.setState(this.scope, {
           [key]: stateValue,
@@ -91,5 +87,4 @@ export default class AppState extends LitElement {
       }
     }
   }
-
 }
