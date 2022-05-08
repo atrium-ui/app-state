@@ -11,5 +11,23 @@
     "ts-loader": "^9.2.6",
     "webpack": "^5.66.0",
     "webpack-cli": "^4.9.1"
-  }
+  },
+  "description": "A Simple Stupid State Manager.",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckydye/app-state.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/luckydye/app-state/issues"
+  },
+  "homepage": "https://github.com/luckydye/app-state#readme"
 }

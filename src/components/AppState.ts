@@ -64,12 +64,12 @@ export default class AppState extends LitElement {
     if (!this.scope) return;
 
     if (target.hasAttribute("state-key")) {
-      const key: string = target.getAttribute("state-key") || this.key;
+      const key: string = target.getAttribute("state-key") as string;
       const stateValue =
         e.detail?.value != null ? e.detail?.value : target.value;
 
       if (target.hasAttribute("state-id")) {
-        const id: string = target.getAttribute("state-id");
+        const id: string = target.getAttribute("state-id") as string;
 
         // set the value of a named state inside a scope
         const state = State.getState(this.scope)[key];
