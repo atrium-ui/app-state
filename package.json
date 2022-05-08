@@ -1,6 +1,6 @@
 {
   "name": "@luckydye/app-state",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "src/index.ts",
   "module": "lib/app-state.min.js",
   "types": "src/index.ts",
