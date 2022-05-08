@@ -1,35 +1,43 @@
 {
-  "name": "@luckydye/app-state",
-  "version": "1.2.2",
-  "main": "src/index.ts",
-  "module": "lib/app-state.min.js",
-  "types": "src/index.ts",
-  "license": "MIT",
-  "dependencies": {
-    "lit": "latest"
-  },
-  "devDependencies": {
-    "ts-loader": "^9.2.6",
-    "rollup": "^2.70.1",
-    "@rollup/plugin-typescript": "^8.3.1"
-  },
-  "description": "A Simple Stupid State Manager.",
-  "directories": {
-    "doc": "docs",
-    "example": "examples"
-  },
-  "scripts": {
-    "build": "rollup -c rollup.config.js",
-    "lint": "eslint --ext .js,.ts .",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/luckydye/app-state.git"
-  },
-  "author": "",
-  "bugs": {
-    "url": "https://github.com/luckydye/app-state/issues"
-  },
-  "homepage": "https://github.com/luckydye/app-state#readme"
+	"name": "@luckydye/app-state",
+	"version": "1.2.2",
+	"main": "src/index.ts",
+	"module": "lib/app-state.min.js",
+	"types": "src/index.ts",
+	"license": "MIT",
+	"dependencies": {
+		"lit": "latest"
+	},
+	"devDependencies": {
+		"ts-loader": "^9.2.6",
+		"tslib": "^2.3.1",
+		"rollup": "^2.70.1",
+		"@rollup/plugin-typescript": "^8.3.1",
+		"@typescript-eslint/eslint-plugin": "^5.16.0",
+		"@typescript-eslint/parser": "^5.16.0",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"prettier": "^2.6.1",
+		"prettier-eslint": "^13.0.0"
+	},
+	"description": "A Simple Stupid State Manager.",
+	"directories": {
+		"doc": "docs",
+		"example": "examples"
+	},
+	"scripts": {
+		"build": "rollup -c rollup.config.js",
+		"lint": "eslint --ext .ts src",
+		"format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/luckydye/app-state.git"
+	},
+	"author": "",
+	"bugs": {
+		"url": "https://github.com/luckydye/app-state/issues"
+	},
+	"homepage": "https://github.com/luckydye/app-state#readme"
 }

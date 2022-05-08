@@ -1,4 +1,4 @@
-import "./components/AppState";
-import State from "./State";
+import './components/AppState';
+import State from './State';
 
 export { State };
