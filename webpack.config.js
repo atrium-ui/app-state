@@ -1,30 +1,28 @@
-const webpack = require('webpack');
-const path = require('path');
-const package = require('./package.json');
+const webpack = require("webpack");
+const path = require("path");
+const package = require("./package.json");
 
-const banner = package.name + ' - ' + package.version;
+const banner = package.name + " - " + package.version;
 
 module.exports = {
-  target: 'web',
-  mode: process.env.NODE_ENV || 'development',
-  entry: './index.ts',
+  target: "web",
+  mode: process.env.NODE_ENV || "development",
+  entry: "./src/index.ts",
   module: {
     rules: [
       {
         test: /\.ts?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
-      }
+      },
     ],
   },
   resolve: {
-    extensions: ['.ts'],
+    extensions: [".ts"],
   },
   output: {
-    filename: 'app-state.min.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: "app-state.min.js",
+    path: path.resolve(__dirname, "lib"),
   },
-  plugins: [
-    new webpack.BannerPlugin(banner)
-  ]
+  plugins: [new webpack.BannerPlugin(banner)],
 };
