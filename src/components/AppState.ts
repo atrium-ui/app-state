@@ -33,10 +33,20 @@ export default class AppState extends LitElement {
 		//  set "value" attribute of children with a "state-key" attribute
 		this._removeStateUpdateHandler = State.onState(this.scope, (data) => {
 			for (const key in data) {
-				const eles = this.querySelectorAll(`[state-key="${key}"]`) as NodeListOf<StateElement>;
+				const eles = this.querySelectorAll(`[state-key*="${key}"]`) as NodeListOf<StateElement>;
 
 				for (const ele of eles) {
-					ele.value = data[key];
+					const attributeValue = ele.getAttribute('state-key');
+
+					if (attributeValue) {
+						const args = attributeValue.split(':');
+
+						if (args.length > 1) {
+							ele[args[0]] = data[key];
+						} else {
+							ele.value = data[key];
+						}
+					}
 				}
 			}
 		});
@@ -62,7 +72,10 @@ export default class AppState extends LitElement {
 		if (!this.scope) return;
 
 		if (target.hasAttribute('state-key')) {
-			const key: string = target.getAttribute('state-key') as string;
+			const keyArguments: string = target.getAttribute('state-key') as string;
+			const args = keyArguments.split(':');
+			const key = args.length > 1 ? args[1] : args[0];
+
 			const stateValue = e.detail?.value != null ? e.detail?.value : target.value;
 
 			if (target.hasAttribute('state-id')) {
