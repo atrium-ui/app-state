@@ -31,34 +31,44 @@ export default class AppState extends LitElement {
 	@property({ type: String, reflect: true })
 	public scope!: StateScope;
 
-	private _StateUpdateHandle?: StateUpdateHandle;
+	private _stateUpdateHandle?: StateUpdateHandle;
 
 	public connectedCallback(): void {
 		for (let event of triggerEvents) {
 			this.addEventListener(event, this.handleEvent as EventListener);
 		}
 
-		// on external state updates
+		// initially emit data to children
+		const scopeState = State.scope(this.scope);
+		if (scopeState) {
+			this.handleStateUpdate(scopeState);
+		}
+
+		// on state updates
 		//  set "value" of children prop with a "state-key" attribute
-		this._StateUpdateHandle = State.on(this.scope, (data) => {
-			for (const key in data) {
-				const eles = this.querySelectorAll(`[state-key*=":${key}"]`) as NodeListOf<StateElement>;
+		this._stateUpdateHandle = State.on(this.scope, (data) => {
+			this.handleStateUpdate(data);
+		});
+	}
 
-				for (const ele of eles) {
-					const attributeValue = ele.getAttribute('state-key');
+	private handleStateUpdate(data: StateScopeObject): void {
+		for (const key in data) {
+			const eles = this.querySelectorAll(`[state-key*=":${key}"]`) as NodeListOf<StateElement>;
 
-					if (attributeValue) {
-						const args = attributeValue.split(':');
+			for (const ele of eles) {
+				const attributeValue = ele.getAttribute('state-key');
 
-						if (args.length > 1) {
-							ele[args[0]] = data[key];
-						} else {
-							ele.value = data[key];
-						}
+				if (attributeValue) {
+					const args = attributeValue.split(':');
+
+					if (args.length > 1) {
+						ele[args[0]] = data[key];
+					} else {
+						ele.value = data[key];
 					}
 				}
 			}
-		});
+		}
 	}
 
 	public disconnectedCallback(): void {
@@ -66,17 +76,17 @@ export default class AppState extends LitElement {
 			this.removeEventListener(event, this.handleEvent as EventListener);
 		}
 
-		if (this._StateUpdateHandle) {
-			this._StateUpdateHandle.remove();
+		if (this._stateUpdateHandle) {
+			this._stateUpdateHandle.remove();
 		}
 	}
 
 	/**
-	 * Handle input events from elements
+	 * Handle trigger events from elements
 	 *  Uses "state-key" of target element.
 	 *  As fallback use the "state-key" attribute from this app-state element.
 	 */
-	private handleEvent(e: CustomEvent) {
+	private handleEvent(e: CustomEvent): void {
 		const target = e.target as StateElement;
 
 		if (!this.scope) return;

@@ -109,7 +109,7 @@ export class State {
 	/**
 	 * listen to state changes of scope
 	 */
-	public static on(scope: StateScope = 'global', callback: (s: StateObject) => void): StateUpdateHandle {
+	public static on(scope: StateScope = 'global', callback: (s: StateScopeObject) => void): StateUpdateHandle {
 		let lastState = {};
 
 		const eventName = 'state:update:' + scope;
