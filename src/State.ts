@@ -2,13 +2,31 @@
  * Application State
  * @typedef {Object} StateObject
  */
-type StateObject = {
-	[key: string]: any;
+export type StateObject = {
+	[key: string]: Record<string, StateScopeObject>;
 };
 
-// TODO: Store State in indexed DB instead of local storage.
-// 				Keep a table for every scope.
-//				Each row is a state in history.
+/**
+ * Handle to a update listener
+ */
+export type StateUpdateHandle = {
+	/**
+	 * Remove listener
+	 */
+	remove: () => void;
+};
+
+declare global {
+	/**
+	 * Scope value type
+	 */
+	type StateScopeObject = Record<string, any>;
+
+	/**
+	 * Scope id type
+	 */
+	type StateScope = 'global' | string;
+}
 
 /**
  * Checks if arguemtn is a valid StateObject
@@ -27,7 +45,7 @@ function isAnStateObject(something) {
  */
 const state: StateObject = {};
 
-export default class State {
+export class State {
 	/**
 	 * This getter returns the current global state
 	 */
@@ -36,9 +54,37 @@ export default class State {
 	}
 
 	/**
+	 * Gets or sets scope value
+	 */
+	public static scope(scope: StateScope, value?: StateScopeObject): StateScopeObject | undefined {
+		if (arguments.length == 1) {
+			return this.get(scope);
+		}
+		if (arguments.length == 2) {
+			this.set(scope, value);
+		}
+	}
+
+	/**
+	 * delete scope in state
+	 */
+	public static deleteScope(scope: StateScope) {
+		delete state[scope];
+		this.emitChange(scope);
+	}
+
+	/**
+	 * delete state in scope
+	 */
+	public static delete(scope: StateScope, stateKey: string) {
+		delete state[scope][stateKey];
+		this.emitChange(scope);
+	}
+
+	/**
 	 * Updates state in scope
 	 */
-	public static setState(scope: string, newState: any) {
+	private static set(scope: StateScope, newState: any) {
 		// deep copy new state and save to global state
 		// NEXT: replace JSON with "deepcopy" at some point
 		state[scope] = Object.assign(state[scope] || {}, JSON.parse(JSON.stringify(newState)));
@@ -46,46 +92,29 @@ export default class State {
 	}
 
 	/**
-	 * delete state in scope
-	 */
-	public static deleteState(scope: string, stateKey: string) {
-		delete state[scope][stateKey];
-		this.emitChange(scope);
-	}
-
-	/**
-	 * delete scope in state
-	 */
-	public static deleteScope(scope: string) {
-		delete state[scope];
-		this.emitChange(scope);
-	}
-
-	/**
 	 * get state of scope
 	 */
-	public static getState(scope = 'global') {
+	private static get(scope: StateScope = 'global') {
 		return state[scope] || {};
 	}
 
 	/**
 	 * send change to all listeners in scope
 	 */
-	private static emitChange(scope: string) {
+	private static emitChange(scope: StateScope) {
 		const ev = new Event('state:update:' + scope);
 		window.dispatchEvent(ev);
-		localStorage.setItem('app-state', JSON.stringify(state));
 	}
 
 	/**
 	 * listen to state changes of scope
 	 */
-	public static onState(scope = 'global', callback: (s: StateObject) => void): () => void {
+	public static on(scope: StateScope = 'global', callback: (s: StateObject) => void): StateUpdateHandle {
 		let lastState = {};
 
 		const eventName = 'state:update:' + scope;
 		const handler = () => {
-			const state = State.getState(scope);
+			const state = State.get(scope);
 			const stateChanges = State.subtractState(lastState, state);
 			lastState = JSON.parse(JSON.stringify(state));
 			// Only serve changed state keys
@@ -96,8 +125,10 @@ export default class State {
 
 		window.addEventListener(eventName, handler);
 
-		return () => {
-			window.removeEventListener(eventName, handler);
+		return {
+			remove() {
+				window.removeEventListener(eventName, handler);
+			}
 		};
 	}
 

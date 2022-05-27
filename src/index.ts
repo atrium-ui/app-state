@@ -1,4 +1,3 @@
 import './components/AppState';
-import State from './State';
 
-export { State };
+export { State } from './State';

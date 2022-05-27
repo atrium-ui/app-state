@@ -1,39 +1,48 @@
 import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import State from '../State';
-import StateElement from '../types/StateElement';
+import { State, StateUpdateHandle } from '../State';
 
 // This is a adapter element, that connects scoped dom elements
 // to the internal application states using DOM events.
 
+interface StateElement extends HTMLElement {
+	value: any;
+}
+
+export const triggerEvents = [
+	// handle any input event
+	'input',
+	// handle any change event
+	'change'
+];
+
 @customElement('app-state')
 export default class AppState extends LitElement {
 	/**
-	 * state key comes from the target element attributes
+	 * state key comes from the target element state-key attribute
 	 *  or this app states attributes as fallback
 	 */
 	@property({ type: String })
-	key?: string;
+	public key?: string;
 
 	/**
-	 * Event root scope
+	 * State scope
 	 */
 	@property({ type: String, reflect: true })
-	scope?: string;
+	public scope!: StateScope;
 
-	_removeStateUpdateHandler?: () => void;
+	private _StateUpdateHandle?: StateUpdateHandle;
 
-	connectedCallback(): void {
-		// handle any change event
-		this.addEventListener('change', this.handleEvent as EventListener);
-		// handle any input event
-		this.addEventListener('input', this.handleEvent as EventListener);
+	public connectedCallback(): void {
+		for (let event of triggerEvents) {
+			this.addEventListener(event, this.handleEvent as EventListener);
+		}
 
 		// on external state updates
-		//  set "value" attribute of children with a "state-key" attribute
-		this._removeStateUpdateHandler = State.onState(this.scope, (data) => {
+		//  set "value" of children prop with a "state-key" attribute
+		this._StateUpdateHandle = State.on(this.scope, (data) => {
 			for (const key in data) {
-				const eles = this.querySelectorAll(`[state-key*="${key}"]`) as NodeListOf<StateElement>;
+				const eles = this.querySelectorAll(`[state-key*=":${key}"]`) as NodeListOf<StateElement>;
 
 				for (const ele of eles) {
 					const attributeValue = ele.getAttribute('state-key');
@@ -52,46 +61,38 @@ export default class AppState extends LitElement {
 		});
 	}
 
-	disconnectedCallback(): void {
-		this.removeEventListener('change', this.handleEvent as EventListener);
-		this.removeEventListener('input', this.handleEvent as EventListener);
+	public disconnectedCallback(): void {
+		for (let event of triggerEvents) {
+			this.removeEventListener(event, this.handleEvent as EventListener);
+		}
 
-		if (this._removeStateUpdateHandler) {
-			this._removeStateUpdateHandler();
+		if (this._StateUpdateHandle) {
+			this._StateUpdateHandle.remove();
 		}
 	}
 
 	/**
 	 * Handle input events from elements
-	 *  Uses "state-key" and "state-id" of target element.
+	 *  Uses "state-key" of target element.
 	 *  As fallback use the "state-key" attribute from this app-state element.
 	 */
-	handleEvent(e: CustomEvent) {
-		const target = e.target as HTMLInputElement;
+	private handleEvent(e: CustomEvent) {
+		const target = e.target as StateElement;
 
 		if (!this.scope) return;
 
 		if (target.hasAttribute('state-key')) {
 			const keyArguments: string = target.getAttribute('state-key') as string;
 			const args = keyArguments.split(':');
-			const key = args.length > 1 ? args[1] : args[0];
+			const targetKey = args[0];
+			const stateKey = args[1] || this.key;
 
-			const stateValue = e.detail?.value != null ? e.detail?.value : target.value;
+			if (targetKey && stateKey) {
+				const stateValue = e.detail != null && e.detail[targetKey] != null ? e.detail[targetKey] : target[targetKey];
 
-			if (target.hasAttribute('state-id')) {
-				const id: string = target.getAttribute('state-id') as string;
-
-				// set the value of a named state inside a scope
-				const state = State.getState(this.scope)[key];
-				state[id] = stateValue;
-				State.setState(this.scope, {
-					[key]: state
-				});
-				e.cancelBubble = true;
-			} else {
 				// set root state value of a scope
-				State.setState(this.scope, {
-					[key]: stateValue
+				State.scope(this.scope, {
+					[stateKey]: stateValue
 				});
 				e.cancelBubble = true;
 			}
