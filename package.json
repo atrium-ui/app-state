@@ -20,8 +20,7 @@
 	},
 	"description": "A Simple Stupid State Manager.",
 	"directories": {
-		"doc": "docs",
-		"example": "examples"
+		"doc": "docs"
 	},
 	"scripts": {
 		"build": "rollup -c rollup.config.js",

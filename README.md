@@ -7,4 +7,6 @@ This State Management system is based on how Events work in HTML5. It uses the b
 The basis of that concept relies on a Custom Element "app-state", which captures and propegates new state of any element contained in its children.
 Every page can have multiple app-state elements.
 
-### TODOs:
+### TODO:
+
+- update docs to v2
