@@ -26,6 +26,13 @@ declare global {
 	 * Scope id type
 	 */
 	type StateScope = 'global' | string;
+
+	/**
+	 * place State class in window for development
+	 */
+	interface Window {
+		State: State;
+	}
 }
 
 /**
@@ -94,7 +101,7 @@ export class State {
 	/**
 	 * get state of scope
 	 */
-	private static get(scope: StateScope = 'global') {
+	private static get(scope: StateScope) {
 		return state[scope] || {};
 	}
 
@@ -109,7 +116,7 @@ export class State {
 	/**
 	 * listen to state changes of scope
 	 */
-	public static on(scope: StateScope = 'global', callback: (s: StateScopeObject) => void): StateUpdateHandle {
+	public static on(scope: StateScope, callback: (s: StateScopeObject) => void): StateUpdateHandle {
 		let lastState = {};
 
 		const eventName = 'state:update:' + scope;
@@ -217,10 +224,4 @@ export class State {
 	}
 }
 
-// Global State var for development
-declare global {
-	interface Window {
-		State: State;
-	}
-}
 window.State = State;

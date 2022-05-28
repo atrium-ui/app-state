@@ -1,5 +1,3 @@
-import { LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
 import { State, StateUpdateHandle } from '../State';
 
 // This is a adapter element, that connects scoped dom elements
@@ -16,20 +14,21 @@ export const triggerEvents = [
 	'change'
 ];
 
-@customElement('app-state')
-export default class AppState extends LitElement {
+export default class AppState extends HTMLElement {
 	/**
 	 * state key comes from the target element state-key attribute
 	 *  or this app states attributes as fallback
 	 */
-	@property({ type: String })
-	public key?: string;
+	public get key(): string | null {
+		return this.getAttribute('key');
+	}
 
 	/**
 	 * State scope
 	 */
-	@property({ type: String, reflect: true })
-	public scope!: StateScope;
+	public get scope(): StateScope {
+		return this.getAttribute('scope') || 'global';
+	}
 
 	private _stateUpdateHandle?: StateUpdateHandle;
 
@@ -109,3 +108,5 @@ export default class AppState extends LitElement {
 		}
 	}
 }
+
+customElements.define('app-state', AppState);
