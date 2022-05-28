@@ -16,24 +16,15 @@ export type StateUpdateHandle = {
 	remove: () => void;
 };
 
-declare global {
-	/**
-	 * Scope value type
-	 */
-	type StateScopeObject = Record<string, any>;
+/**
+ * Scope value type
+ */
+export type StateScopeObject = Record<string, any>;
 
-	/**
-	 * Scope id type
-	 */
-	type StateScope = 'global' | string;
-
-	/**
-	 * place State class in window for development
-	 */
-	interface Window {
-		State: State;
-	}
-}
+/**
+ * Scope id type
+ */
+export type StateScope = 'global' | string;
 
 /**
  * Checks if arguemtn is a valid StateObject
@@ -224,4 +215,12 @@ export class State {
 	}
 }
 
+declare global {
+	/**
+	 * place State class in window for development
+	 */
+	interface Window {
+		State: State;
+	}
+}
 window.State = State;

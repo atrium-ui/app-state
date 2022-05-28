@@ -1,3 +1,4 @@
+import { StateScope, StateScopeObject } from './../State';
 import { State, StateUpdateHandle } from '../State';
 
 // This is a adapter element, that connects scoped dom elements
