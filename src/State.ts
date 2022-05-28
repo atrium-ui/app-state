@@ -54,7 +54,7 @@ export class State {
 	/**
 	 * Gets or sets scope value
 	 */
-	public static scope(scope: StateScope, value?: StateScopeObject): StateScopeObject | undefined {
+	public static scope<T>(scope: StateScope, value?: T | StateScopeObject): StateScopeObject | undefined {
 		if (arguments.length == 1) {
 			return this.get(scope);
 		}
