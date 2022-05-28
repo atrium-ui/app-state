@@ -16,15 +16,17 @@ export type StateUpdateHandle = {
 	remove: () => void;
 };
 
-/**
- * Scope value type
- */
-export type StateScopeObject = Record<string, any>;
+declare global {
+	/**
+	 * Scope value type
+	 */
+	export type StateScopeObject = Record<string, any>;
 
-/**
- * Scope id type
- */
-export type StateScope = 'global' | string;
+	/**
+	 * Scope id type
+	 */
+	export type StateScope = 'global' | string;
+}
 
 /**
  * Checks if arguemtn is a valid StateObject
@@ -54,7 +56,7 @@ export class State {
 	/**
 	 * Gets or sets scope value
 	 */
-	public static scope<T>(scope: StateScope, value?: T | StateScopeObject): StateScopeObject | undefined {
+	public static scope(scope: StateScope, value?: StateScopeObject): StateScopeObject | undefined {
 		if (arguments.length == 1) {
 			return this.get(scope);
 		}

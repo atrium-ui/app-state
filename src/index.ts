@@ -1,3 +1,3 @@
 import './components/AppState';
 
-export { State, StateScope, StateScopeObject } from './State';
+export { State } from './State';
