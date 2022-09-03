@@ -42,6 +42,7 @@ function isAnStateObject(something) {
 
 /**
  * Stores the application state
+ * TODO: Make this a Map<>.
  */
 const state: StateObject = {};
 
