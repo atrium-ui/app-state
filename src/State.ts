@@ -42,7 +42,7 @@ function isAnStateObject(something) {
 
 /**
  * Stores the application state
- * TODO: Make this a Map<>.
+ * TODO: Make this a Map<> to partition the scopes into seperate serializeable objects.
  */
 const state: StateObject = {};
 
