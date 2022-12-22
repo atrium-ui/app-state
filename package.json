@@ -1,39 +1,24 @@
 {
-	"name": "@luckydye/app-state",
-	"version": "2.0.3",
-	"main": "src/index.ts",
-	"module": "lib/app-state.min.js",
+	"name": "@atrium-ui/app-state",
+	"version": "0.1.0",
+	"main": "dist/app-state.es.js",
+	"module": "dist/app-state.es.js",
 	"types": "src/index.ts",
 	"license": "MIT",
+	"dependencies": {
+		"lit": "^2.2.7"
+	},
 	"devDependencies": {
-		"@rollup/plugin-typescript": "^8.3.1",
-		"@typescript-eslint/eslint-plugin": "^5.16.0",
-		"@typescript-eslint/parser": "^5.16.0",
-		"eslint": "^7.32.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-prettier": "^4.0.0",
-		"prettier": "^2.6.1",
-		"prettier-eslint": "^13.0.0",
-		"rollup": "^2.70.1",
-		"ts-loader": "^9.2.6",
-		"tslib": "^2.3.1"
+		"vite": "^2.9.14"
 	},
 	"description": "A Simple Stupid State Manager.",
 	"directories": {
 		"doc": "docs"
 	},
 	"scripts": {
-		"build": "rollup -c rollup.config.js",
-		"lint": "eslint --ext .ts src",
+		"dev": "vite",
+		"build": "vite build",
+		"lint": "eslint --ext .ts .",
 		"format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/luckydye/app-state.git"
-	},
-	"author": "",
-	"bugs": {
-		"url": "https://github.com/luckydye/app-state/issues"
-	},
-	"homepage": "https://github.com/luckydye/app-state#readme"
+	}
 }

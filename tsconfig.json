@@ -3,16 +3,15 @@
 		"target": "ES2018",
 		"module": "ESNext",
 		"strict": true,
-		"importHelpers": true,
-		"allowJs": true,
 		"moduleResolution": "node",
-		"skipLibCheck": true,
-		"noImplicitAny": false,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
+		"noImplicitAny": true,
 		"experimentalDecorators": true,
-		"lib": ["esnext", "dom", "dom.iterable", "scripthost", "webworker"]
+		"useDefineForClassFields": false,
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"paths": {
+			"~/*": ["./*"]
+		}
 	},
-	"include": ["src"],
 	"exclude": ["node_modules"]
 }
